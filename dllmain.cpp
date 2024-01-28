@@ -1,19 +1,56 @@
-﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
-#include "pch.h"
+﻿#include <thread>
+#include <chrono>
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
-    }
-    return TRUE;
+#include <Windows.h>
+
+#include "CoreLogic.h"
+
+// Thanks for OpenGL-Hk repo (https://github.com/aXXo-dev/OpenGL-Hk/tree/main/src/Dependencies/lib)
+
+
+void __stdcall ThreadLoop(HINSTANCE hInstance) {
+  if (!CCoreGeneral::IsMinecraftProcess()) {
+    printf("[x] Sorry, that the target process is not Minecraft game process. \n");
+    goto InjectExit;
+  };
+
+  printf("[-] Module Loaded! \n");
+
+  CCoreRender::Init();
+
+  while (!GetAsyncKeyState(VK_END)) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(25));
+  };
+
+  CCoreRender::Destroy();
+
+  InjectExit:
+  FreeLibrary(hInstance);
+
+};
+
+
+BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
+
+  static std::thread thLoop;
+
+  if (dwReason == DLL_PROCESS_ATTACH) {
+    DisableThreadLibraryCalls(hInstance);
+
+    // debug
+    AllocConsole();
+    freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+
+    thLoop = std::thread([hInstance] { ThreadLoop(hInstance); });
+    if (thLoop.joinable()) {
+      thLoop.detach();
+    };
+  };
+
+  if (dwReason == DLL_PROCESS_DETACH) {
+    FreeConsole();
+    fclose(stdout);
+  };
+
+  return TRUE;
 }
-

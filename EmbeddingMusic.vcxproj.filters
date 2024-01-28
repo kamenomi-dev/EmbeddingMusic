@@ -13,21 +13,78 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{b37ea8b4-cd4a-4b4b-b43c-6e07e6fbb802}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ImGUI">
+      <UniqueIdentifier>{1fae7c62-881b-4fb3-ab85-4d043374c537}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\MinHook">
+      <UniqueIdentifier>{800466e5-818d-46df-a98d-a6c29b568b3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="CoreLogic.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="Render.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\imstb_truetype.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\imconfig.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\imgui.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\backends\imgui_impl_opengl3.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\backends\imgui_impl_win32.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\imgui_internal.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\imstb_rectpack.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\imstb_textedit.h">
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MinHook.h">
+      <Filter>include\MinHook</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="CoreLogic.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGUI\imgui.cpp">
+      <Filter>include\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGUI\imgui_draw.cpp">
+      <Filter>include\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGUI\backends\imgui_impl_opengl3.cpp">
+      <Filter>include\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGUI\backends\imgui_impl_win32.cpp">
+      <Filter>include\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGUI\imgui_tables.cpp">
+      <Filter>include\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGUI\imgui_widgets.cpp">
+      <Filter>include\ImGUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
