@@ -1,13 +1,7 @@
 #include "CoreLogic.h"
 #include <string>
 
-static WNDPROC LastWndProc{};
-static twglSwapBuffers LastWglSwapBuffers{};
-static void* FuncSwapBuffers{};
-
-bool newWglSwapBuffers(HDC hDC);
-LRESULT LogicWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+static WNDPROC LastWndProc{ nullptr };
 
 // General functions.
 
@@ -50,11 +44,11 @@ HWND CCoreGeneral::GetMinecraftHWND() {
     printf("[x] It is not a real Minecraft game process. [CCoreGeneral::GetMinecraftHWND()] \n");
     return NULL;
   };
-
+  std::cout << CCoreLogic::Get() << " | " << GetCurrentProcessId() << std::endl;
   HWND curHWND = NULL;
-  auto currentPID = CCoreRender::Get()->GetProcessId();
+  auto currentPID = GetCurrentProcessId();
   std::vector<HWND> vecWnd(0);
-
+  printf("TEST \n");
   GetWindowByPID(currentPID, vecWnd);
   for (auto item : vecWnd) {
     char* chClassName = new char[255];
@@ -75,16 +69,12 @@ HWND CCoreGeneral::GetMinecraftHWND() {
   return curHWND;
 }
 
+void CCoreLogic::PrivateInit() {
+  pidMinecraft = GetCurrentProcessId();
 
-HWND CCoreRender::hMinecraft = NULL;
-DWORD CCoreRender::ProcessId = NULL;
-
-void CCoreRender::PrivateInit() {
-  ProcessId = GetCurrentProcessId();
   printf("[-] Have a good day! :D \n");
 
   hMinecraft = CCoreGeneral::GetMinecraftHWND();
-
 
   if (!hMinecraft) {
     return void(printf("[x] Failed to get game window handle. \n"));
@@ -94,21 +84,21 @@ void CCoreRender::PrivateInit() {
 
   MH_Initialize();
 
-  FuncSwapBuffers = (void*)GetProcAddress((HMODULE)GetModuleHandleW(L"opengl32.dll"), "wglSwapBuffers");
-
-  if (!FuncSwapBuffers) {
+  ptrSwapBuffers = (void*)GetProcAddress((HMODULE)GetModuleHandleW(L"opengl32.dll"), "wglSwapBuffers");
+  if (!ptrSwapBuffers) {
     return void(printf("[x] Failed to get wglSwapBuffers(opengl32.dll). \n"));
   }
 
-  MH_CreateHook(FuncSwapBuffers, &newWglSwapBuffers, (LPVOID*)&LastWglSwapBuffers);
+  MH_CreateHook(ptrSwapBuffers, &wglSwapBuffersHook, (LPVOID*)&lastWglSwapBuffers);
   MH_EnableHook(MH_ALL_HOOKS);
 };
 
 
-void CCoreRender::PrivateDestroy() {
+void CCoreLogic::PrivateDestroy() {
   SetWindowLongPtrW(hMinecraft, GWLP_WNDPROC, (LONG_PTR)LastWndProc);
+
   MH_DisableHook(MH_ALL_HOOKS);
-  Render::Destroy();
+  CRender::Get()->Destroy();
   MH_RemoveHook(MH_ALL_HOOKS);
 }
 
@@ -117,39 +107,23 @@ void CCoreRender::PrivateDestroy() {
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT __stdcall LogicWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT __stdcall CCoreLogic::LogicWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 
-  if (Render::IsInit()) {
-    if (uMsg == WM_KEYDOWN && wParam == VK_RSHIFT) {
-      Render::isVisible = !Render::isVisible;
+  if (CRender::Get()) {
+    if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
+      CRender::Get()->isVisible = !CRender::Get()->isVisible;
     };
 
-    if (Render::isVisible && ImGui::IsMousePosValid()) {
-      /*
-      * 
-      * Bullshit, I even cannot solve this problem. Why it doesn't make a effect on window title.
-      * 
-        RECT rcWnd{};
-        RECT rcClientWnd{};
-        GetWindowRect(hWnd, &rcWnd);
-        GetClientRect(hWnd, &rcClientWnd);
-        if (rcWnd.left < LOWORD(lParam) && LOWORD(lParam) < rcWnd.right && rcWnd.top < HIWORD(lParam) && HIWORD(lParam) < rcClientWnd.top) {
-          goto CallLastProc;
-          return true;
-        };
-      */
-
-      ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+    if (CRender::Get()->isVisible && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
       return true;
     };
   };
 
-  CallLastProc:
   return CallWindowProcA(LastWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-bool __stdcall newWglSwapBuffers(HDC hDC) {
+bool __stdcall CCoreLogic::wglSwapBuffersHook(HDC hDC) {
   static HGLRC LastContext{ wglGetCurrentContext() };
   static HGLRC NewContext{};
   static GLint LastViewport[4];
@@ -158,19 +132,17 @@ bool __stdcall newWglSwapBuffers(HDC hDC) {
   glGetIntegerv(GL_VIEWPORT, viewport);
 
   static bool init = false;
-  if (!init || viewport[2] != LastViewport[2] || viewport[3] != LastViewport[3])
-  {
-    if (NewContext)
-    {
+  if (!init || viewport[2] != LastViewport[2] || viewport[3] != LastViewport[3]) {
+    if (NewContext) {
+      CRender::Get()->Shutdown();
       wglMakeCurrent(hDC, LastContext);
-      Render::Shutdown();
       wglDeleteContext(NewContext);
-    }
+    };
 
     NewContext = wglCreateContext(hDC);
     wglMakeCurrent(hDC, NewContext);
 
-    glViewport(0, 0, viewport[2], viewport[3]);
+    glViewport(0, 0, viewport[2] * 0.5, viewport[3] * 0.5);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, viewport[2], viewport[3], 0, -1, 1);
@@ -178,10 +150,11 @@ bool __stdcall newWglSwapBuffers(HDC hDC) {
     glLoadIdentity();
     glDisable(GL_DEPTH_TEST);
 
-    if (!Render::IsInit())
-      Render::Init(CCoreRender::GetWindowHandle());
+
+    if (!CRender::IsInit())
+      CRender::Init(CCoreLogic::Get()->hMinecraft);
     else
-      Render::Update(CCoreRender::GetWindowHandle());
+      CRender::Get()->Update(CCoreLogic::Get()->hMinecraft);
 
     memcpy(LastViewport, viewport, sizeof(GLint) * 4);
 
@@ -190,33 +163,30 @@ bool __stdcall newWglSwapBuffers(HDC hDC) {
   else {
 
     wglMakeCurrent(hDC, NewContext);
-    Render::Draw();
+    CRender::Get()->Draw();
 
   }
 
   wglMakeCurrent(hDC, LastContext);
 
-  return LastWglSwapBuffers(hDC);
+  return CCoreLogic::Get()->lastWglSwapBuffers(hDC);
 }
 
 
-// Core Render single.
+// Singleton stuff
 
 
-CCoreRender* CCoreRender::p_instance;
+CCoreLogic* CCoreLogic::p_instance;
+std::mutex CCoreLogic::mutex;
 
-CCoreRender::CCoreRender() {
-  this->PrivateInit();
-}
-
-void CCoreRender::Init() {
+void CCoreLogic::Init() {
   if (p_instance != nullptr)
     return;
 
-  p_instance = new CCoreRender;
+  p_instance = new CCoreLogic;
 }
 
-void CCoreRender::Destroy() {
+void CCoreLogic::Destroy() {
   if (p_instance == nullptr)
     return;
 
@@ -226,11 +196,9 @@ void CCoreRender::Destroy() {
   p_instance = nullptr;
 }
 
-bool CCoreRender::IsInit() {
-  return p_instance != nullptr;
-};
+CCoreLogic* CCoreLogic::Get() {
+  // std::lock_guard<std::mutex> lock(mutex);
 
-CCoreRender* CCoreRender::Get() {
   if (p_instance == nullptr) {
     return nullptr;
   }
@@ -238,10 +206,6 @@ CCoreRender* CCoreRender::Get() {
   return p_instance;
 };
 
-HWND& CCoreRender::GetWindowHandle() {
-  return hMinecraft;
-};
-
-DWORD CCoreRender::GetProcessId() {
-  return ProcessId;
+bool CCoreLogic::IsInit() {
+  return p_instance != nullptr;
 };

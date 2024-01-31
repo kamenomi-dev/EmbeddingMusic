@@ -16,13 +16,13 @@ void __stdcall ThreadLoop(HINSTANCE hInstance) {
 
   printf("[-] Module Loaded! \n");
 
-  CCoreRender::Init();
+  CCoreLogic::Init();
 
   while (!GetAsyncKeyState(VK_END)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(25));
   };
 
-  CCoreRender::Destroy();
+  CCoreLogic::Destroy();
 
   InjectExit:
   FreeLibrary(hInstance);

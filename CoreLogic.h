@@ -3,6 +3,8 @@
 #define CORELOGIC_H
 
 #include <iostream>
+#include <memory>
+#include <mutex>
 
 #include <Windows.h>
 #include <gl/GL.h>
@@ -12,28 +14,36 @@
 
 typedef BOOL(__stdcall* twglSwapBuffers) (HDC hDC);
 
-class CCoreRender {
+class CCoreLogic {
   public:
-  static HWND& GetWindowHandle();
-  static DWORD GetProcessId();
+  CCoreLogic(const CCoreLogic()) = delete;
+  void operator=(const CCoreLogic&) = delete;
+
+  static bool IsInit();
+  static void Init();
+  static void Destroy();
+  static CCoreLogic* Get();
 
   private:
-  CCoreRender();
   void PrivateInit();
   void PrivateDestroy();
 
-public:
-  static void Init();
-  static void Destroy();
-  static bool IsInit();
-  static CCoreRender* Get();
+  CCoreLogic() {
+    PrivateInit();
+  }
+  
+  static LRESULT __stdcall LogicWndProc(HWND, UINT, WPARAM, LPARAM);
+  static bool    __stdcall wglSwapBuffersHook(HDC);
+
+  public:
+  HWND hMinecraft{ nullptr };
+  DWORD pidMinecraft = NULL;
+  void* ptrSwapBuffers{ nullptr };
+  twglSwapBuffers lastWglSwapBuffers{ nullptr };
 
 private:
-  HWND static hMinecraft;
-  DWORD static ProcessId;
-
-private:
-  static CCoreRender* p_instance;
+  static CCoreLogic* p_instance;
+  static std::mutex mutex;
 };
 
 #include <vector>

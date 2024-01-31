@@ -1,22 +1,14 @@
 #include "Render.h"
 
-static bool RenderInit{};
-
-
-
-void Render::Update(HWND& hWnd) {
+void CRender::Update(HWND& hWnd) {
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
-
   ImGui::StyleColorsDark();
   ImGui_ImplWin32_Init(hWnd);
-  ImGui_ImplOpenGL3_Init();
+  ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-void Render::Shutdown() {
-  if (!RenderInit)
-	return;
-
+void CRender::Shutdown() {
   isVisible = false;
 
   ImGui_ImplOpenGL3_Shutdown();
@@ -26,13 +18,14 @@ void Render::Shutdown() {
 
 // Render Main Bus.
 
-void Render::Draw() {
+void CRender::Draw() {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplWin32_NewFrame();
   ImGui::NewFrame();
   
+
   if (isVisible) {
-	ImGui::Begin("EmbeddingMusic - Thanks, OpenGL-Hk! ");
+	ImGui::Begin("EmbeddingMusic - Thanks, OpenGL-Hk! ", NULL, ImGuiWindowFlags_NoCollapse);
 	ImGui::Text("Hello, World!");
 	ImGui::End();
   };
@@ -42,21 +35,40 @@ void Render::Draw() {
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Render::Init(HWND& hWnd) {
-  if (RenderInit) {
+
+// Singleton stuff
+
+CRender* CRender::p_instance;
+std::mutex CRender::mutex;
+
+void CRender::Init(HWND& hWnd) {
+  if (p_instance != nullptr) {
 	return;
   };
 
-  RenderInit = true;
-  Update(hWnd);
+  p_instance = new CRender(hWnd);
 }
 
-void Render::Destroy() {
-  Shutdown();
+void CRender::Destroy() {
+  if (p_instance == nullptr) {
+	return;
+  }
 
-  RenderInit = false;
+  p_instance->Shutdown();
+
+  delete p_instance;
+  p_instance = nullptr;
 };
 
-bool Render::IsInit() {
-  return RenderInit;
+CRender* CRender::Get() {
+  // std::lock_guard<std::mutex> lock(mutex);
+
+  if (p_instance == nullptr)
+	return nullptr;
+
+  return p_instance;
+}; 
+
+bool CRender::IsInit() {
+  return p_instance != nullptr;
 }
