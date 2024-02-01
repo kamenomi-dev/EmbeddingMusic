@@ -8,7 +8,9 @@
 
 #include <Windows.h>
 #include <gl/GL.h>
+
 #include <MinHook.h>
+#include <spdlog/spdlog.h>
 
 #include "Render.h"
 

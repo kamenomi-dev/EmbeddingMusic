@@ -41,14 +41,14 @@ void CCoreGeneral::GetWindowByPID(DWORD dwPID, std::vector<HWND>& vecWindows) {
 HWND CCoreGeneral::GetMinecraftHWND() {
 
   if (!IsMinecraftProcess()) {
-    printf("[x] It is not a real Minecraft game process. [CCoreGeneral::GetMinecraftHWND()] \n");
+    spdlog::error("It is not a real Minecraft game process. [CCoreGeneral::GetMinecraftHWND()] ");
     return NULL;
   };
-  std::cout << CCoreLogic::Get() << " | " << GetCurrentProcessId() << std::endl;
+
   HWND curHWND = NULL;
   auto currentPID = GetCurrentProcessId();
   std::vector<HWND> vecWnd(0);
-  printf("TEST \n");
+
   GetWindowByPID(currentPID, vecWnd);
   for (auto item : vecWnd) {
     char* chClassName = new char[255];
@@ -72,12 +72,12 @@ HWND CCoreGeneral::GetMinecraftHWND() {
 void CCoreLogic::PrivateInit() {
   pidMinecraft = GetCurrentProcessId();
 
-  printf("[-] Have a good day! :D \n");
+  spdlog::info("Have a good day! :D ");
 
   hMinecraft = CCoreGeneral::GetMinecraftHWND();
 
   if (!hMinecraft) {
-    return void(printf("[x] Failed to get game window handle. \n"));
+    return void(spdlog::error("Failed to get game window handle. "));
   };
 
   LastWndProc = (WNDPROC)SetWindowLongPtrW(hMinecraft, GWLP_WNDPROC, (LONG_PTR)LogicWndProc);
@@ -86,7 +86,7 @@ void CCoreLogic::PrivateInit() {
 
   ptrSwapBuffers = (void*)GetProcAddress((HMODULE)GetModuleHandleW(L"opengl32.dll"), "wglSwapBuffers");
   if (!ptrSwapBuffers) {
-    return void(printf("[x] Failed to get wglSwapBuffers(opengl32.dll). \n"));
+    return void(spdlog::error("[x] Failed to get wglSwapBuffers(opengl32.dll). \n"));
   }
 
   MH_CreateHook(ptrSwapBuffers, &wglSwapBuffersHook, (LPVOID*)&lastWglSwapBuffers);
@@ -115,8 +115,13 @@ LRESULT __stdcall CCoreLogic::LogicWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
       CRender::Get()->isVisible = !CRender::Get()->isVisible;
     };
 
-    if (CRender::Get()->isVisible && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
-      return true;
+    if (CRender::Get()->isVisible) {
+      if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
+        if ((uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) && (wParam < 256)) {
+          return CallWindowProcA(LastWndProc, hWnd, uMsg, wParam, lParam);
+        }
+        return true;
+      }
     };
   };
 
@@ -132,23 +137,24 @@ bool __stdcall CCoreLogic::wglSwapBuffersHook(HDC hDC) {
   glGetIntegerv(GL_VIEWPORT, viewport);
 
   static bool init = false;
+
   if (!init || viewport[2] != LastViewport[2] || viewport[3] != LastViewport[3]) {
     if (NewContext) {
-      CRender::Get()->Shutdown();
       wglMakeCurrent(hDC, LastContext);
+      CRender::Get()->Shutdown();
       wglDeleteContext(NewContext);
     };
 
     NewContext = wglCreateContext(hDC);
     wglMakeCurrent(hDC, NewContext);
 
-    glViewport(0, 0, viewport[2] * 0.5, viewport[3] * 0.5);
+    glViewport(0, 0, viewport[2], viewport[3]);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, viewport[2], viewport[3], 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_DEPTH_TEST);
 
 
     if (!CRender::IsInit())
@@ -197,7 +203,7 @@ void CCoreLogic::Destroy() {
 }
 
 CCoreLogic* CCoreLogic::Get() {
-  // std::lock_guard<std::mutex> lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   if (p_instance == nullptr) {
     return nullptr;

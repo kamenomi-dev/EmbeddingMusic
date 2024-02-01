@@ -61,7 +61,7 @@ void CRender::Destroy() {
 };
 
 CRender* CRender::Get() {
-  // std::lock_guard<std::mutex> lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
 
   if (p_instance == nullptr)
 	return nullptr;

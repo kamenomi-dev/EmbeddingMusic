@@ -5,6 +5,8 @@
 #include <memory>
 #include <mutex>
 
+#include <spdlog/spdlog.h>
+
 #include <Windows.h>
 #include <ImGui/imgui.h>
 #include <ImGui/backends/imgui_impl_win32.h>

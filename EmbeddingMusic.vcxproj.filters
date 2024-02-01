@@ -22,6 +22,9 @@
     <Filter Include="include\MinHook">
       <UniqueIdentifier>{800466e5-818d-46df-a98d-a6c29b568b3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\interface">
+      <UniqueIdentifier>{7f378f84-d8a5-4b62-9314-5c4559ca368f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoreLogic.h">
@@ -56,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="include\MinHook.h">
       <Filter>include\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI\backends\imgui_impl_opengl3_loader.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
