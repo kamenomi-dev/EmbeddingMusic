@@ -26,6 +26,9 @@ class CRender final {
   void Update(HWND& hWnd);
   void Shutdown();
 
+  bool IsVisible();
+  void Visible(bool state);
+
   private:
   CRender(HWND& hWnd)
   {
@@ -33,9 +36,10 @@ class CRender final {
   }
 
   public:
-  bool isVisible = true;
 
   private:
+  bool isVisible = true;
+
   static CRender* p_instance;
   static std::mutex mutex;
 };

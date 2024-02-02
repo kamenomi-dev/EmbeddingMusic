@@ -9,7 +9,7 @@ void CRender::Update(HWND& hWnd) {
 }
 
 void CRender::Shutdown() {
-  isVisible = false;
+  Visible(false);
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplWin32_Shutdown();
@@ -24,7 +24,7 @@ void CRender::Draw() {
   ImGui::NewFrame();
   
 
-  if (isVisible) {
+  if (IsVisible()) {
 	ImGui::Begin("EmbeddingMusic - Thanks, OpenGL-Hk! ", NULL, ImGuiWindowFlags_NoCollapse);
 	ImGui::Text("Hello, World!");
 	ImGui::End();
@@ -34,6 +34,15 @@ void CRender::Draw() {
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+
+bool CRender::IsVisible() {
+  return isVisible;
+};
+void CRender::Visible(bool state) {
+  spdlog::info("Visible changed, State: ");
+  isVisible = state;
+};
 
 
 // Singleton stuff

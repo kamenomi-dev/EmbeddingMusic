@@ -112,10 +112,10 @@ LRESULT __stdcall CCoreLogic::LogicWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
   if (CRender::Get()) {
     if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
-      CRender::Get()->isVisible = !CRender::Get()->isVisible;
+      CRender::Get()->Visible(!CRender::Get()->IsVisible());
     };
 
-    if (CRender::Get()->isVisible) {
+    if (CRender::Get()->IsVisible()) {
       if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
         if ((uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) && (wParam < 256)) {
           return CallWindowProcA(LastWndProc, hWnd, uMsg, wParam, lParam);
