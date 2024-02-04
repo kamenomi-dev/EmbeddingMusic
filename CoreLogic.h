@@ -10,7 +10,7 @@
 #include <gl/GL.h>
 
 #include <MinHook.h>
-#include <spdlog/spdlog.h>
+#include "interface/logger.hpp"
 
 #include "Render.h"
 

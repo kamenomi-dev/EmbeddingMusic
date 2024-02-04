@@ -41,7 +41,10 @@ void CCoreGeneral::GetWindowByPID(DWORD dwPID, std::vector<HWND>& vecWindows) {
 HWND CCoreGeneral::GetMinecraftHWND() {
 
   if (!IsMinecraftProcess()) {
-    spdlog::error("It is not a real Minecraft game process. [CCoreGeneral::GetMinecraftHWND()] ");
+    g_logger << logger_level::LL_ERROR
+             << "It is not a real Minecraft game process. "
+             << "[CCoreGeneral::GetMinecraftHWND()]"
+             << std::endl;
     return NULL;
   };
 
@@ -72,12 +75,12 @@ HWND CCoreGeneral::GetMinecraftHWND() {
 void CCoreLogic::PrivateInit() {
   pidMinecraft = GetCurrentProcessId();
 
-  spdlog::info("Have a good day! :D ");
+  g_logger << logger_level::LL_INFO << "Have a good day! :D " << std::endl;
 
   hMinecraft = CCoreGeneral::GetMinecraftHWND();
 
   if (!hMinecraft) {
-    return void(spdlog::error("Failed to get game window handle. "));
+    return void(g_logger << logger_level::LL_ERROR << "Failed to get game window handle. " << std::endl);
   };
 
   LastWndProc = (WNDPROC)SetWindowLongPtrW(hMinecraft, GWLP_WNDPROC, (LONG_PTR)LogicWndProc);
@@ -86,7 +89,11 @@ void CCoreLogic::PrivateInit() {
 
   ptrSwapBuffers = (void*)GetProcAddress((HMODULE)GetModuleHandleW(L"opengl32.dll"), "wglSwapBuffers");
   if (!ptrSwapBuffers) {
-    return void(spdlog::error("[x] Failed to get wglSwapBuffers(opengl32.dll). \n"));
+    return void(
+        g_logger << logger_level::LL_ERROR
+                 << "[x] Failed to get wglSwapBuffers(opengl32.dll). "
+                 << std::endl
+      );
   }
 
   MH_CreateHook(ptrSwapBuffers, &wglSwapBuffersHook, (LPVOID*)&lastWglSwapBuffers);

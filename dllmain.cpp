@@ -3,8 +3,7 @@
 
 #include <Windows.h>
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
+#include "interface/logger.hpp"
 #include "CoreLogic.h"
 
 // Thanks for OpenGL-Hk repo (https://github.com/aXXo-dev/OpenGL-Hk/tree/main/src/Dependencies/lib)
@@ -13,11 +12,13 @@
 void __stdcall ThreadLoop(HINSTANCE hInstance) {
 
   if (!CCoreGeneral::IsMinecraftProcess()) {
-    spdlog::error("Sorry, that the target process is not Minecraft game process. ");
+    g_logger << logger_level::LL_ERROR
+             << "Sorry, that the target process is not Minecraft game process. "
+             << std::endl;
     goto InjectExit;
   };
 
-  spdlog::info("Module Loaded! ");
+  g_logger << logger_level::LL_INFO << "Module Loaded! " << std::endl;
 
   CCoreLogic::Init();
 
@@ -43,13 +44,9 @@ BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
     // debug
     AllocConsole();
     freopen_s((FILE**)stdout, "CONOUT$", "w+t", stdout);
+    g_logger << logger_level::LL_INFO
+             << "test" << std::endl;
 
-    spdlog::flush_on(spdlog::level::debug);
-
-    spdlog::debug("DLL_PROCESS_ATTACH");
-
-
-    printf(std::string(std::to_string(spdlog::should_log(spdlog::level::info))).c_str());
 
     thLoop = std::thread([hInstance] { ThreadLoop(hInstance); });
     if (thLoop.joinable()) {
@@ -59,8 +56,6 @@ BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
   };
 
   if (dwReason == DLL_PROCESS_DETACH) {
-    
-    spdlog::shutdown();
 
     FreeConsole();
     fclose(stdout);

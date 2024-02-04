@@ -16,7 +16,30 @@ void CRender::Shutdown() {
   ImGui::DestroyContext();
 }
 
+bool CRender::IsVisible() {
+  return isVisible;
+};
+
+void CRender::Visible(bool state) {
+  g_logger << logger_level::LL_INFO << "Visible changed, State: " << state
+           << std::endl;
+  isVisible = state;
+};
+
 // Render Main Bus.
+
+void DrawWindowFrame() {
+
+  ImGui::Begin("EmbeddingMusic",
+              NULL,
+               ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+  {
+    ImGui::Text("Well done");
+  };
+  ImGui::End();
+}
+
+
 
 void CRender::Draw() {
   ImGui_ImplOpenGL3_NewFrame();
@@ -25,24 +48,13 @@ void CRender::Draw() {
   
 
   if (IsVisible()) {
-	ImGui::Begin("EmbeddingMusic - Thanks, OpenGL-Hk! ", NULL, ImGuiWindowFlags_NoCollapse);
-	ImGui::Text("Hello, World!");
-	ImGui::End();
+    DrawWindowFrame();
   };
 
   ImGui::EndFrame();
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
-
-
-bool CRender::IsVisible() {
-  return isVisible;
-};
-void CRender::Visible(bool state) {
-  spdlog::info("Visible changed, State: ");
-  isVisible = state;
-};
 
 
 // Singleton stuff

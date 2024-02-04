@@ -5,7 +5,7 @@
 #include <memory>
 #include <mutex>
 
-#include <spdlog/spdlog.h>
+#include "interface/logger.hpp"
 
 #include <Windows.h>
 #include <ImGui/imgui.h>

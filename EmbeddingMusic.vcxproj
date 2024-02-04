@@ -74,6 +74,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -125,7 +126,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <CallingConvention>Cdecl</CallingConvention>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include/ImGUI;%(AdditionalIncludeDirectories);F:\projects\EmbeddingMusic\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -175,6 +176,7 @@
     <ClInclude Include="include\ImGUI\imstb_textedit.h" />
     <ClInclude Include="include\ImGUI\imstb_truetype.h" />
     <ClInclude Include="include\MinHook.h" />
+    <ClInclude Include="interface\logger.hpp" />
     <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +188,7 @@
     <ClCompile Include="include\ImGUI\imgui_draw.cpp" />
     <ClCompile Include="include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="include\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="interface\logger.cc" />
     <ClCompile Include="Render.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

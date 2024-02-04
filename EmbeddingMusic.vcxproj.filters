@@ -22,8 +22,8 @@
     <Filter Include="include\MinHook">
       <UniqueIdentifier>{800466e5-818d-46df-a98d-a6c29b568b3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\interface">
-      <UniqueIdentifier>{7f378f84-d8a5-4b62-9314-5c4559ca368f}</UniqueIdentifier>
+    <Filter Include="interface">
+      <UniqueIdentifier>{83f4c9b3-0a42-4c21-956a-74eaddbf8a24}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,7 +61,10 @@
       <Filter>include\MinHook</Filter>
     </ClInclude>
     <ClInclude Include="include\ImGUI\backends\imgui_impl_opengl3_loader.h">
-      <Filter>头文件</Filter>
+      <Filter>include\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\logger.hpp">
+      <Filter>interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="include\ImGUI\imgui_widgets.cpp">
       <Filter>include\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="interface\logger.cc">
+      <Filter>interface</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
