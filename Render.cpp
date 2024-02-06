@@ -2,14 +2,27 @@
 
 void CRender::Update(HWND& hWnd) {
   ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  const ImGuiIO& io = ImGui::GetIO();
+  resourceList = {
+      {"defaultDisplayFont",
+       io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/segoeui.ttf", 24)},
+      {"defaultTitleFont",
+       io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/segoeuib.ttf", 24)}
+  };
+      
+  io.Fonts->Build();
   ImGui::StyleColorsDark();
   ImGui_ImplWin32_Init(hWnd);
   ImGui_ImplOpenGL3_Init("#version 330");
 }
 
+std::unordered_map<const char*, void*> CRender::GetResource() {
+  return this->resourceList;
+}
+
 void CRender::Shutdown() {
   Visible(false);
+  resourceList.clear();
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplWin32_Shutdown();
@@ -28,15 +41,48 @@ void CRender::Visible(bool state) {
 
 // Render Main Bus.
 
-void DrawWindowFrame() {
-
-  ImGui::Begin("EmbeddingMusic",
-              NULL,
-               ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+void DrawWindowFrame(CRender* self) {
+  const ImGuiIO& io = ImGui::GetIO();
   {
-    ImGui::Text("Well done");
-  };
-  ImGui::End();
+    {
+      ImGui::PushFont((ImFont*)self->GetResource()["defaultTitleFont"]);
+      ImGui::Text("EmbeddingMusic");
+      ImGui::PopFont();
+    };
+    
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    ImGui::BeginGroup();
+    {
+      ImGui::PushItemWidth(78);
+      ImGui::PushFont((ImFont*) self->GetResource()["defaultDisplayFont"]);
+      ImGui::Text("Combataaaaaaaaaaaaaaaaaa");
+      ImGui::PopFont();
+      ImGui::PopItemWidth();
+
+      if (ImGui::Button("233")) {
+        // todo so
+      }
+    };
+    ImGui::EndGroup();
+
+    {
+      if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+          if (ImGui::MenuItem("Open..")) { /* Do stuff */
+          }
+          if (ImGui::MenuItem("Save")) { /* Do stuff */
+          }
+          if (ImGui::MenuItem("Close")) {
+
+          }
+          ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+      }
+    }
+  }
 }
 
 
@@ -48,7 +94,15 @@ void CRender::Draw() {
   
 
   if (IsVisible()) {
-    DrawWindowFrame();
+    ImGui::SetNextWindowSize(ImVec2(800, 600));
+
+    ImGui::Begin("EmbeddingMusic", NULL,
+                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    
+    DrawWindowFrame(this);
+    Layout::main::Render();
+
+    ImGui::End();
   };
 
   ImGui::EndFrame();

@@ -177,6 +177,7 @@
     <ClInclude Include="include\ImGUI\imstb_truetype.h" />
     <ClInclude Include="include\MinHook.h" />
     <ClInclude Include="interface\logger.hpp" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +190,7 @@
     <ClCompile Include="include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="include\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="interface\logger.cc" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Render.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

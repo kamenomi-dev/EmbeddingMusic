@@ -43,8 +43,7 @@ HWND CCoreGeneral::GetMinecraftHWND() {
   if (!IsMinecraftProcess()) {
     g_logger << logger_level::LL_ERROR
              << "It is not a real Minecraft game process. "
-             << "[CCoreGeneral::GetMinecraftHWND()]"
-             << std::endl;
+             << "[CCoreGeneral::GetMinecraftHWND()]" << std::endl;
     return NULL;
   };
 

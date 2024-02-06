@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
 #include "interface/logger.hpp"
 
@@ -11,6 +12,10 @@
 #include <ImGui/imgui.h>
 #include <ImGui/backends/imgui_impl_win32.h>
 #include <ImGui/backends/imgui_impl_opengl3.h>
+
+// layout include
+namespace Layout {};
+#include "main.h"
 
 class CRender final {
   public:
@@ -24,6 +29,7 @@ class CRender final {
 
   void Draw();
   void Update(HWND& hWnd);
+  std::unordered_map<const char*, void*> GetResource();
   void Shutdown();
 
   bool IsVisible();
@@ -39,6 +45,7 @@ class CRender final {
 
   private:
   bool isVisible = true;
+   std::unordered_map<const char*, void*> resourceList{};
 
   static CRender* p_instance;
   static std::mutex mutex;
